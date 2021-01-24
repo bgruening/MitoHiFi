@@ -18,8 +18,6 @@
 """
 
 import pandas as pd
-import sys
-
 
 my_names = [
     "qseqid",
@@ -67,13 +65,15 @@ result = pd.merge(a, seqsizes, on="qseqid")
 result
 
 # Now let's filter the blast matches
-# if the lenght of the query is 5x the size of the subject (close-related mitogenome), drop it. (As its likely the match belongs to a NUMT)
+# if the lenght of the query is 5x the size of the subject (close-related mitogenome), drop it.
+# (As its likely the match belongs to a NUMT)
 five_times = result["s_length"] * 5
 result1 = result[(result["leng_query"] < five_times)].sort_values(
     by="%q_in_match", ascending=False
 )
 
-# if the lenght of the query is 80% smaller than the length of the subject, drop it. It's unlikely you will have a complete mitogenome.
+# if the lenght of the query is 80% smaller than the length of the subject, drop it.
+# It's unlikely you will have a complete mitogenome.
 slen = result1["s_length"]
 result1["perc"] = result1["leng_query"] * 100 / (result1["s_length"])
 ac = result1[result1["perc"] > 80].sort_values(by="%q_in_match")

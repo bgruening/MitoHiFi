@@ -18,8 +18,6 @@
 """
 
 import pandas as pd
-import sys
-
 
 my_names = [
     "qseqid",
@@ -66,13 +64,15 @@ seqsizes = blast_cov[["qseqid", "leng_query", "s_length"]].drop_duplicates(
 result = pd.merge(a, seqsizes, on="qseqid")
 
 # Now let's filter the blast matches
-# if the lenght of the query is 5x the size of the subject (close-related mitogenome), drop it. (As its likely the match belongs to a NUMT)
+# if the lenght of the query is 5x the size of the subject (close-related mitogenome), drop it.
+# (As its likely the match belongs to a NUMT)
 five_times = result["s_length"] * 5
 result1 = result[(result["leng_query"] < five_times)].sort_values(
     by="%q_in_match", ascending=False
 )
 
-# if the lenght of the query is smaller than the length of the subject, drop it. Unlikely you will have a complete mitogenome.
+# if the lenght of the query is smaller than the length of the subject, drop it.
+# Unlikely you will have a complete mitogenome.
 slen = result1["s_length"]
 ac = result1[result1["leng_query"] > slen].sort_values(by="%q_in_match")
 
@@ -84,5 +84,9 @@ ac[(ac["%q_in_match"] > 0)].sort_values(by="%q_in_match", ascending=False).to_cs
 
 
 print(
-    "Parsing of blast done!! Have a look at your new created file 'parsed_blast.All_QueryLengthPerc.txt' \n -- Are the percentage of your queries length in the blast matches less than 70%? --  \n If so, run 'python scripts/parse_blast_subject.py' and look at the results. \n Its likely you have a large NUMT pulling all the mitoreads to it. You will need to identify those reads and run an assembler again, then come back to MitoHiFi."
+    "Parsing of blast done!! Have a look at your new created file 'parsed_blast.All_QueryLengthPerc.txt' \n"
+    + " -- Are the percentage of your queries length in the blast matches less than 70%? --  \n"
+    + "If so, run 'python scripts/parse_blast_subject.py' and look at the results. \n"
+    + "Its likely you have a large NUMT pulling all the mitoreads to it."
+    + "You will need to identify those reads and run an assembler again, then come back to MitoHiFi."
 )

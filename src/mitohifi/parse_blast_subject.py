@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import pandas as pd
-import sys
 
 """
 You should run this script if the pipeline fails in parsing the blast. It's very likely you have
@@ -48,5 +47,9 @@ a = (
 )
 a.to_csv("parsed_blast_SumPercSubject.txt", index=False, sep="\t")
 print(
-    "If on your new created file 'parsed_blast_SumPercSubject.txt' you see 100% or close to it of your subject in the blast match, its very likely you have a large NUMT pulling all the mitoreads to it. \n You will need to identify those reads and run an assembler again (e.g. hicanu or hifiasm), then come back to MitoHiFi with the mito assembled contigs."
+    "If on your new created file 'parsed_blast_SumPercSubject.txt' you see 100% or close to it of"
+    + "your subject in the blast match,"
+    + "its very likely you have a large NUMT pulling all the mitoreads to it. \n"
+    + "You will need to identify those reads and run an assembler again"
+    + "(e.g. hicanu or hifiasm), then come back to MitoHiFi with the mito assembled contigs."
 )

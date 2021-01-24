@@ -14,7 +14,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import sys, re
+import re
+import sys
+from optparse import OptionParser
+from random import sample
+
+from Bio import SeqIO
 
 try:
     import gzip
@@ -22,10 +27,6 @@ try:
     gzImported = True
 except ImportError:
     gzImported = False
-from random import sample
-from optparse import OptionParser
-
-from Bio import SeqIO
 
 
 def filterFasta(
@@ -61,7 +62,7 @@ def filterLengthIdList(
     neg=False,
     log=sys.stderr,
 ):
-    if not idList is None:
+    if idList is not None:
         if regex:
             idRes = [re.compile(x) for x in idList]
         else:
@@ -75,17 +76,17 @@ def filterLengthIdList(
     if log:
         log.write("Filtering and writing...\n")
     try:
-        l = 0
+        counter = 0
         n = 0
         for rec in SeqIO.parse(inStream, format):
-            l += 1
-            if log and l % 1000 == 0:
-                log.write("\r%i records done" % l)
+            counter += 1
+            if log and counter % 1000 == 0:
+                log.write(f"\r{counter} records done")
             write = True
-            if not minLength is None and len(rec) < minLength:
+            if minLength is not None and len(rec) < minLength:
                 # if a min length was set skip the record if is to short
                 write = False
-            elif not idList is None:
+            elif idList is not None:
                 if regex:
                     if all([r.match(rec.id) is None for r in idRes]):
                         # id the record id does not match any of the given REs
@@ -98,7 +99,9 @@ def filterLengthIdList(
                 out.write(rec.format(format))
                 n += 1
         if log:
-            log.write("\n%i out of %i sequences remained after filtering.\n" % (n, l))
+            log.write(
+                "\n%i out of %i sequences remained after filtering.\n" % (n, counter)
+            )
     finally:
         out.close()
 
@@ -111,20 +114,20 @@ def sampleRandom(inStream, outPath, format, number, log):
             out = outPath
         if log:
             log.write("Counting sequences in file...\n")
-        l = 0
+        counter = 0
         for rec in SeqIO.parse(inStream, format):
-            l += 1
+            counter += 1
         inStream.seek(0, 0)
-        if number > l:
+        if number > counter:
             raise ValueError(
-                "Sample size(%i) is bigger than number of "
-                "sequences in input file(%i)." % (number, l)
+                f"Sample size({number}) is bigger than number of "
+                f"sequences in input file({counter})."
             )
         if log:
-            log.write("Sampling %i from %i sequences...\n" % (number, l))
+            log.write("Sampling %i from %i sequences...\n" % (number, counter))
         n = 0  # record number
         i = 0  # index of next sampled record
-        ls = sample(range(0, l), number)
+        ls = sample(range(0, counter), number)
         ls.sort()
         for rec in SeqIO.parse(inStream, format):
             if n == ls[i]:  # if this record is the nextsampled
