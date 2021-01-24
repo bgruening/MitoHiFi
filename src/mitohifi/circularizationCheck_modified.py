@@ -27,7 +27,6 @@ SOFTWARE.
 import os
 import shlex
 import sys
-
 from subprocess import Popen
 
 from Bio import SearchIO, SeqIO
