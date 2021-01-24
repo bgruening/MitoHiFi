@@ -45,13 +45,11 @@ def circularizationCheck(resultFile, circularSize, circularOffSet):
         # if blastFolder == 'installed':
         #     command = "formatdb -in " + resultFile + " -p F" # need to formatdb refseq first
         # else:
-        command = (
-            "makeblastdb -in " + resultFile + " -dbtype nucl"
-        )  # need to formatdb refseq first
+        command = f"makeblastdb -in {resultFile} -dbtype nucl"  # need to formatdb refseq first
         args = shlex.split(command)
         formatDB = Popen(args, stdout=open(os.devnull, "wb"))
         formatDB.wait()
-    except:
+    except Exception:
         print("\nformatDB during circularization check failed...\n")
         return (False, -1, -1)
 
@@ -61,13 +59,7 @@ def circularizationCheck(resultFile, circularSize, circularOffSet):
         # if blastFolder == 'installed':
         # command = "blastall -p blastn -d " + resultFile + " -i " + resultFile + " -m 7" #call BLAST with XML output
         # else:
-        command = (
-            "blastn -task blastn -db "
-            + resultFile
-            + " -query "
-            + resultFile
-            + " -outfmt 5"
-        )  # call BLAST with XML output
+        command = f"blastn -task blastn -db {resultFile} -query {resultFile} -outfmt 5"  # call BLAST with XML output
         args = shlex.split(command)
         blastAll = Popen(args, stdout=blastResultFile)
         blastAll.wait()
@@ -78,7 +70,7 @@ def circularizationCheck(resultFile, circularSize, circularOffSet):
 
     """
     Let's loop through all blast results and see if there is a circularization.
-    Do it by looking at all HSPs in the parse and see if there is an alignment of the ending of the sequence 
+    Do it by looking at all HSPs in the parse and see if there is an alignment of the ending of the sequence
     with the start of that same sequence. It should have a considerable size, you don't want to say it circularized
     if only a couple of bases matched.
     Returns True or False, x_coordinate, y_coordinate
@@ -86,17 +78,14 @@ def circularizationCheck(resultFile, circularSize, circularOffSet):
     y coordinate = ending point of circularization match
     """
     for qresult in blastparse:  # in each query...
-        for (
-            hsp
-        ) in (
-            qresult.hsps
-        ):  # loop through all HSPs looking for a circularization (perceived as a hsp with start somewhat close to the query finish)
+        # loop through all HSPs looking for a circularization
+        # (perceived as a hsp with start somewhat close to the query finish)
+        for hsp in qresult.hsps:
             if (
-                (hsp.query_range[0] >= 0 and hsp.query_range[0] <= circularOffSet)
-                and (
-                    hsp.hit_range[0] >= sizeOfSeq - hsp.aln_span - circularOffSet
-                    and hsp.hit_range[0] <= sizeOfSeq + circularOffSet
-                )
+                hsp.query_range[0] >= 0
+                and hsp.query_range[0] <= circularOffSet
+                and hsp.hit_range[0] >= sizeOfSeq - hsp.aln_span - circularOffSet
+                and hsp.hit_range[0] <= sizeOfSeq + circularOffSet
                 and hsp.aln_span >= circularSize
                 and hsp.aln_span < sizeOfSeq * 0.90
             ):

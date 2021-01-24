@@ -90,13 +90,13 @@ def main():
         if args.force or args.skip_failures:
             sys.stderr.write(
                 "INFO: at least one input record is not longer "
-                "than {} bp rotation size.\n\n".format(abs(rotation_size))
+                f"than {abs(rotation_size)} bp rotation size.\n\n"
             )
         else:
             sys.stderr.write(
                 "ERROR: at least one input record is not longer "
-                "than {} bp. To forcibly rotate anyways, re-run with --force "
-                "or specify a smaller rotation size.\n\n".format(abs(rotation_size))
+                f"than {abs(rotation_size)} bp. To forcibly rotate anyways, re-run with --force "
+                "or specify a smaller rotation size.\n\n"
             )
             sys.exit(1)
 
@@ -130,10 +130,10 @@ def main():
                 continue
             else:
                 sys.stderr.write(
-                    "INFO: {} sequence ({} bp) is not longer "
-                    "than the specified {} bp rotation size. To forcibly "
+                    f"INFO: {record.id} sequence ({seq_length} bp) is not longer "
+                    f"than the specified {abs(rotation_size)} bp rotation size. To forcibly "
                     "rotate anyways, re-run with --force or specify a "
-                    "smaller rotation size.\n".format(record.id, abs(rotation_size))
+                    "smaller rotation size.\n"
                 )
                 sys.exit(1)
 
@@ -141,7 +141,7 @@ def main():
     if args.outfile is None:
         ofh = sys.stdout
     else:
-        ofh = os.path.abspath(os.path.expanduser(outfile))
+        ofh = os.path.abspath(os.path.expanduser(args.outfile))
     SeqIO.write(rotated_records, ofh, "fasta")
 
 
